@@ -2,9 +2,7 @@ package com.nikitolproject.twitchwatcher.tasks;
 
 import com.nikitolproject.twitchwatcher.TwitchWatcherPlugin;
 import com.nikitolproject.twitchwatcher.twitch.model.Streamer;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import com.nikitolproject.twitchwatcher.util.AnnouncementUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -28,43 +26,34 @@ public class TwitchCheckTask extends BukkitRunnable {
         }
 
         try {
-            Set<String> currentLiveStreamers = plugin.getTwitchAPI().getLiveStreamers(streamers);
-            Set<String> previouslyLiveStreamers = plugin.getLiveStreamers();
+            Set<String> currentLiveOnTwitch = plugin.getTwitchAPI().getLiveStreamers(streamers);
+            Set<String> previouslyLiveOnTwitch = plugin.getLiveStreamersOnTwitch();
+            Set<String> announcedStreamers = plugin.getAnnouncedStreamers();
+
+            previouslyLiveOnTwitch.clear();
+            previouslyLiveOnTwitch.addAll(currentLiveOnTwitch);
 
             for (Streamer streamer : streamers) {
                 String twitchNickname = streamer.getTwitchNickname().toLowerCase();
-                boolean isCurrentlyLive = currentLiveStreamers.contains(twitchNickname);
-                boolean wasPreviouslyLive = previouslyLiveStreamers.contains(twitchNickname);
+                boolean isLive = currentLiveOnTwitch.contains(twitchNickname);
 
-                if (isCurrentlyLive && !wasPreviouslyLive) {
-                    announceStream(streamer);
-                    previouslyLiveStreamers.add(twitchNickname);
-                } else if (!isCurrentlyLive && wasPreviouslyLive) {
-                    previouslyLiveStreamers.remove(twitchNickname);
+                if (isLive) {
+                    if (!announcedStreamers.contains(twitchNickname)) {
+                        boolean shouldAnnounce = !plugin.getConfigManager().isCheckPlayerOnline() ||
+                                Bukkit.getPlayer(streamer.getMinecraftNickname()) != null;
+
+                        if (shouldAnnounce) {
+                            AnnouncementUtil.announceStream(plugin, streamer);
+                            announcedStreamers.add(twitchNickname);
+                        }
+                    }
+                } else {
+                    announcedStreamers.remove(twitchNickname);
                 }
             }
 
         } catch (IOException e) {
             plugin.getLogger().warning("Error checking Twitch streams: " + e.getMessage());
-        }
-    }
-
-    private void announceStream(Streamer streamer) {
-        List<String> messageLines = plugin.getConfigManager().getStreamStartMessage();
-        String twitchUrl = "https://twitch.tv/" + streamer.getTwitchNickname();
-
-        for (String line : messageLines) {
-            String processedLine = line
-                    .replace("%streamer_name%", streamer.getTwitchNickname())
-                    .replace("%minecraft_name%", streamer.getMinecraftNickname());
-
-            Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(processedLine);
-
-            if (line.contains("https://twitch.tv/%streamer_name%")) {
-                component = component.clickEvent(ClickEvent.openUrl(twitchUrl));
-            }
-
-            Bukkit.broadcast(component);
         }
     }
 }

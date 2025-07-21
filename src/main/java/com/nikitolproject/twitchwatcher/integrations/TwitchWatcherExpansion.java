@@ -36,7 +36,7 @@ public class TwitchWatcherExpansion extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (params.equalsIgnoreCase("live_count")) {
-            return String.valueOf(plugin.getLiveStreamers().size());
+            return String.valueOf(plugin.getAnnouncedStreamers().size());
         }
         return null;
     }

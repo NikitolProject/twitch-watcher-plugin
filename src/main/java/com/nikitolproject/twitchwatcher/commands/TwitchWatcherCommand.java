@@ -6,6 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
@@ -26,7 +27,7 @@ public class TwitchWatcherCommand extends Command {
         this.setAliases(List.of("tw"));
         this.setDescription("Main command for the TwitchWatcher plugin.");
         this.setUsage("/twitchwatcher <reload|list>");
-        this.setPermission("twitchwatcher.admin"); // Default permission for base command
+        this.setPermission("twitchwatcher.admin");
     }
 
     @Override
@@ -59,17 +60,19 @@ public class TwitchWatcherCommand extends Command {
     }
 
     private void handleListCommand(CommandSender sender) {
-        Set<String> liveStreamers = plugin.getLiveStreamers();
+        Set<String> liveStreamers = plugin.getAnnouncedStreamers();
 
         if (liveStreamers.isEmpty()) {
-            sender.sendMessage(Component.text("No streamers are currently live.", NamedTextColor.YELLOW));
+            String noOneLiveMessage = plugin.getConfigManager().getNoOneIsLiveMessage();
+            sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(noOneLiveMessage));
             return;
         }
 
+        String headerFormat = plugin.getConfigManager().getListHeader();
+        String header = headerFormat.replace("%count%", String.valueOf(liveStreamers.size()));
+
         TextComponent.Builder message = Component.text()
-                .append(Component.text("--- Live Streamers (", NamedTextColor.GOLD, TextDecoration.BOLD))
-                .append(Component.text(liveStreamers.size(), NamedTextColor.AQUA))
-                .append(Component.text(") ---", NamedTextColor.GOLD, TextDecoration.BOLD));
+                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(header));
 
         for (String streamerName : liveStreamers) {
             String url = "https://twitch.tv/" + streamerName;

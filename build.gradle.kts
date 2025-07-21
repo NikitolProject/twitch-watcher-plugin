@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.nikitolproject"
-version = "1.0.0"
+version = "1.1.0"
 description = "A plugin that notifies players when a streamer goes live on Twitch."
 
 java {

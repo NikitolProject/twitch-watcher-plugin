@@ -47,6 +47,18 @@ public class ConfigManager {
     }
 
     public List<String> getStreamStartMessage() {
-        return config.getStringList("messages.stream-start");
+        return config.getStringList("notifications.stream-start");
+    }
+
+    public boolean isCheckPlayerOnline() {
+        return config.getBoolean("notifications.check-if-player-is-online", true);
+    }
+
+    public String getListHeader() {
+        return config.getString("notifications.list-header", "&e&lLive Streamers (%count%):");
+    }
+
+    public String getNoOneIsLiveMessage() {
+        return config.getString("notifications.no-one-is-live", "&cNo one is live right now.");
     }
 }

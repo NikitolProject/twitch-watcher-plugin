@@ -28,46 +28,36 @@
 Основной файл конфигурации, где вы можете настроить все аспекты плагина.
 
 ```yaml
-# =====================================================
-# Twitch Watcher Plugin Configuration
-# =====================================================
-
-# Настройки для подключения к Twitch API.
-# 1. Перейдите в Twitch Developer Console: https://dev.twitch.tv/console/apps
-# 2. Нажмите "Register Your Application".
-# 3. Введите имя, в поле "OAuth Redirect URLs" укажите http://localhost и выберите категорию "Application Integration".
-# 4. Включите 2FA на своем аккаунте Twitch, если еще не сделали этого.
-# 5. Скопируйте Client ID и Client Secret в поля ниже.
-twitch-api:
-  client-id: "ВАШ_CLIENT_ID"
-  client-secret: "ВАШ_CLIENT_SECRET"
+# ... (секция twitch-api)
 
 # Интервал проверки статуса стримеров (в секундах).
-# Не рекомендуется ставить слишком низкое значение во избежание блокировки от API Twitch.
-# Оптимальное значение: 60-120 секунд.
 check-interval-seconds: 60
 
 # Список стримеров для отслеживания.
-# - twitch-nickname: никнейм на Twitch (важен для API).
-# - minecraft-nickname: никнейм игрока на сервере (для упоминания в сообщении).
 streamers:
   - twitch-nickname: "xQc"
     minecraft-nickname: "MasterGamer123"
   - twitch-nickname: "summit1g"
     minecraft-nickname: "ServerAdmin"
-  - twitch-nickname: "shroud"
-    minecraft-nickname: "ProSniper"
 
-# Настройки сообщений.
-# Доступные плейсхолдеры:
-# %streamer_name% - Никнейм стримера на Twitch.
-# %minecraft_name% - Никнейм игрока на сервере.
-messages:
+# Настройки уведомлений.
+notifications:
+  # Если true, плагин будет отправлять уведомление о начале стрима, только если стример онлайн на сервере.
+  # Если стример начнет стрим, будучи оффлайн, уведомление придет, как только он зайдет на сервер.
+  check-if-player-is-online: true
+  # Настройки сообщений.
+  # Доступные плейсхолдеры:
+  # %streamer_name% - Никнейм стримера на Twitch.
+  # %minecraft_name% - Никнейм игрока на сервере.
   stream-start:
     - "&e&lСТРИМ!"
     - "&aИгрок &f%minecraft_name% &aначал трансляцию на Twitch!"
     - "&7Смотрите его на канале: &dhttps://twitch.tv/%streamer_name%"
     - ""
+
+  # Сообщения для команды /tw list. Доступен плейсхолдер %count%.
+  list-header: "&e&lСтримеры онлайн (%count%):"
+  no-one-is-live: "&cСейчас никто не стримит."
 ```
 
 ## Команды и права доступа

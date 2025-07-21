@@ -2,9 +2,10 @@ package com.nikitolproject.twitchwatcher;
 
 import com.nikitolproject.twitchwatcher.commands.TwitchWatcherCommand;
 import com.nikitolproject.twitchwatcher.config.ConfigManager;
+import com.nikitolproject.twitchwatcher.integrations.TwitchWatcherExpansion;
+import com.nikitolproject.twitchwatcher.listeners.PlayerJoinListener;
 import com.nikitolproject.twitchwatcher.tasks.TwitchCheckTask;
 import com.nikitolproject.twitchwatcher.twitch.TwitchAPI;
-import com.nikitolproject.twitchwatcher.integrations.TwitchWatcherExpansion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Set;
@@ -15,7 +16,8 @@ public class TwitchWatcherPlugin extends JavaPlugin {
     private ConfigManager configManager;
     private TwitchAPI twitchAPI;
     private TwitchCheckTask twitchCheckTask;
-    private final Set<String> liveStreamers = ConcurrentHashMap.newKeySet();
+    private final Set<String> liveStreamersOnTwitch = ConcurrentHashMap.newKeySet();
+    private final Set<String> announcedStreamers = ConcurrentHashMap.newKeySet();
 
     @Override
     public void onEnable() {
@@ -32,6 +34,7 @@ public class TwitchWatcherPlugin extends JavaPlugin {
         twitchCheckTask.runTaskTimerAsynchronously(this, 0, interval);
 
         this.getServer().getCommandMap().register("twitchwatcher", new TwitchWatcherCommand(this));
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new TwitchWatcherExpansion(this).register();
@@ -57,15 +60,20 @@ public class TwitchWatcherPlugin extends JavaPlugin {
         return twitchAPI;
     }
 
-    public Set<String> getLiveStreamers() {
-        return liveStreamers;
+    public Set<String> getLiveStreamersOnTwitch() {
+        return liveStreamersOnTwitch;
+    }
+
+    public Set<String> getAnnouncedStreamers() {
+        return announcedStreamers;
     }
 
     public void reloadPlugin() {
         if (twitchCheckTask != null) {
             twitchCheckTask.cancel();
         }
-        liveStreamers.clear();
+        liveStreamersOnTwitch.clear();
+        announcedStreamers.clear();
         configManager.loadConfig();
         twitchAPI = new TwitchAPI(
                 configManager.getTwitchClientId(),
@@ -76,3 +84,4 @@ public class TwitchWatcherPlugin extends JavaPlugin {
         twitchCheckTask.runTaskTimerAsynchronously(this, 0, interval);
     }
 }
+
