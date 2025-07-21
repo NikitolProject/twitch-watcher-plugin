@@ -1,0 +1,11 @@
+name: TwitchWatcher
+version: ${version}
+main: com.nikitolproject.twitchwatcher.TwitchWatcherPlugin
+description: A plugin that notifies players when a streamer goes live on Twitch.
+author: NikitoLProject
+api-version: 1.21
+load: POSTWORLD
+dependencies:
+  - name: PlaceholderAPI
+    required: false
+    load: BEFORE

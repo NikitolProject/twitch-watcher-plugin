@@ -1,0 +1,36 @@
+# =====================================================
+# Twitch Watcher Plugin Configuration
+# =====================================================
+
+# Настройки для подключения к Twitch API.
+# Получить их можно здесь: https://dev.twitch.tv/console/apps
+twitch-api:
+  client-id: "ВАШ_CLIENT_ID"
+  client-secret: "ВАШ_CLIENT_SECRET"
+
+# Интервал проверки статуса стримеров (в секундах).
+# Не рекомендуется ставить слишком низкое значение во избежание блокировки от API Twitch.
+# Оптимальное значение: 60-120 секунд.
+check-interval-seconds: 60
+
+# Список стримеров для отслеживания.
+# - twitch-nickname: никнейм на Twitch (важен для API).
+# - minecraft-nickname: никнейм игрока на сервере (для упоминания в сообщении).
+streamers:
+  - twitch-nickname: "xQc"
+    minecraft-nickname: "MasterGamer123"
+  - twitch-nickname: "summit1g"
+    minecraft-nickname: "ServerAdmin"
+  - twitch-nickname: "shroud"
+    minecraft-nickname: "ProSniper"
+
+# Настройки сообщений.
+# Доступные плейсхолдеры:
+# %streamer_name% - Никнейм стримера на Twitch.
+# %minecraft_name% - Никнейм игрока на сервере.
+messages:
+  stream-start:
+    - "&e&lСТРИМ!"
+    - "&aИгрок &f%minecraft_name% &aначал трансляцию на Twitch!"
+    - "&7Смотрите его на канале: &dhttps://twitch.tv/%streamer_name%"
+    - ""
